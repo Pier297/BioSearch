@@ -6,8 +6,6 @@ import cytoscape from 'cytoscape';
 export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
   useEffect(() => {
       if (drawGraph) {
-        console.log('Drawing:')
-        console.log(data)
         var cy = cytoscape({
           container: document.getElementById('cy'),
           style: [
@@ -15,7 +13,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
               selector: 'node',
               style: {
                 'background-color': '#f37f0d',
-                'label': 'data(name)'
+                'label': 'data(label)'
               }
             },
             {
@@ -24,7 +22,8 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
                 'width': 3,
                 'line-color': '#ccc',
                 'target-arrow-color': '#ccc',
-                'target-arrow-shape': 'triangle'
+                'target-arrow-shape': 'triangle',
+                //'label': 'data(label)', // maps to data.label
               }
             }
           ],
@@ -32,8 +31,26 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
         });
         const nodes = data.elements.nodes
         const edges = data.elements.edges
-        cy.add(nodes)
-        cy.add(edges)
+        for (let i = 0; i < nodes.length; i++) {
+          cy.add({
+            group: 'nodes',
+            data: {
+              id: nodes[i].data.id,
+              label: nodes[i].data.mention,
+            },
+          });
+        }
+        for (let i = 0; i < edges.length; i++) {
+          cy.add({
+            group: 'edges',
+            data: {
+              id: edges[i].data.id,
+              source: edges[i].data.source,
+              target: edges[i].data.target,
+              //label: 1
+            },
+          });
+        }
         // use spring layout
         cy.layout({
           name: 'cose',
@@ -45,7 +62,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
         cy.center();
 
       }
-  }, [data]);
+  }, [data, drawGraph, setDrawGraph]);
 
   return (
     <div id="cy"></div>
