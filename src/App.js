@@ -3,10 +3,10 @@ import { useState } from 'react';
 import SearchBar from './SearchBar';
 import CytoscapeGraph from './CytoscapeGraph';
 
-function handleSubmit(query, setData, setDrawGraph, setSpinning) {
+function handleSubmit(query, setData, setDrawGraph, setSpinning, maxPublications) {
   setSpinning(true);
   // GET 127.0.0.1:5000/get_graph/<string:query></string:query>
-  fetch(`http://127.0.0.1:5000/get_graph/${query}`)
+  fetch(`http://127.0.0.1:5000/get_graph/${query}/${maxPublications}`)
     .then(res => res.json())
     .then(data => {
       setData(data);
@@ -17,7 +17,6 @@ function handleSubmit(query, setData, setDrawGraph, setSpinning) {
 }
 
 function App() {
-  const [query, setQuery] = useState('diabetes');
   const [data, setData] = useState([]);
   const [drawGraph, setDrawGraph] = useState(false);
   // whether we're waiting for the server to respond
@@ -29,7 +28,7 @@ function App() {
         <h1 className="AppName">BioSearch</h1>
       </div>
       <div className='Search__container'>
-        <SearchBar query={query} setQuery={setQuery} onSubmit={() => handleSubmit(query, setData, setDrawGraph, setSpinning)} spinning={spinning} />
+        <SearchBar onSubmit={(query, maxPublications) => handleSubmit(query, setData, setDrawGraph, setSpinning, maxPublications)} spinning={spinning} />
       </div>
       <div className='Content__container'>
         <CytoscapeGraph data={data} drawGraph={drawGraph} setDrawGraph={setDrawGraph} />

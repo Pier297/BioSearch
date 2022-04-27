@@ -5,7 +5,6 @@ Make sure to start the pubmad server before running this command:
 > npm start
 
 OBIETTIVI:
-- toggle Mostra/Nascondi nodi isolati
 - METTERE FILTRI AVANZATI NELLA QUERY (MAX_ARTICLES, YEAR, ...)
 
 - Cliccare nodo grafo e vedere:
