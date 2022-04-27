@@ -76,6 +76,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
   return (
     <div className="CytoscapeGraph__container">
       <div className='sidebar'>
+        <h3 className='sidebar_title'>Options:</h3>
         <label>Hide isolated nodes</label>
         <input type='checkbox' className='checkbox' defaultChecked={hideIsolatedNodes} onChange={() => {
           setHideIsolatedNodes(!hideIsolatedNodes);

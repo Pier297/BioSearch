@@ -5,7 +5,8 @@ Make sure to start the pubmad server before running this command:
 > npm start
 
 OBIETTIVI:
-- METTERE FILTRI AVANZATI NELLA QUERY (MAX_ARTICLES, YEAR, ...)
+- BUG: se si fa una query usando biobert, poi si toglie biobert e si rifa la query tutto ok, ma se poi
+       rimetti biobert le relazioni rimangono le co-occurrences
 
 - Cliccare nodo grafo e vedere:
     - Quali sono gli articoli collegati
