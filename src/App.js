@@ -3,27 +3,37 @@ import { useState } from 'react';
 import SearchBar from './SearchBar';
 import CytoscapeGraph from './CytoscapeGraph';
 
-function handleSubmit(query, setData, setDrawGraph) {
+function handleSubmit(query, setData, setDrawGraph, setSpinning) {
+  setSpinning(true);
   // GET 127.0.0.1:5000/get_graph/<string:query></string:query>
   fetch(`http://127.0.0.1:5000/get_graph/${query}`)
     .then(res => res.json())
     .then(data => {
       setData(data);
+      setSpinning(false);
       setDrawGraph(true);
     }
   );
 }
 
 function App() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState('diabetes');
   const [data, setData] = useState([]);
   const [drawGraph, setDrawGraph] = useState(false);
+  // whether we're waiting for the server to respond
+  const [spinning, setSpinning] = useState(false);
 
   return (
     <div className="App">
-      <h1 className="AppName">BioSearch</h1>
-      <SearchBar query={query} setQuery={setQuery} onSubmit={() => handleSubmit(query, setData, setDrawGraph)} />
-      <CytoscapeGraph data={data} drawGraph={drawGraph} setDrawGraph={setDrawGraph} />
+      <div className='Logo__container'>
+        <h1 className="AppName">BioSearch</h1>
+      </div>
+      <div className='Search__container'>
+        <SearchBar query={query} setQuery={setQuery} onSubmit={() => handleSubmit(query, setData, setDrawGraph, setSpinning)} spinning={spinning} />
+      </div>
+      <div className='Content__container'>
+        <CytoscapeGraph data={data} drawGraph={drawGraph} setDrawGraph={setDrawGraph} />
+      </div>
     </div>
   );
 }

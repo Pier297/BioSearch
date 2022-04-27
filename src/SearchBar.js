@@ -1,6 +1,6 @@
 import './SearchBar.css';
 
-export default function SearchBar({ query, setQuery, onSubmit }) {
+export default function SearchBar({ query, setQuery, onSubmit, spinning }) {
   return (
     <div className="SearchBar">
       <input
@@ -11,6 +11,7 @@ export default function SearchBar({ query, setQuery, onSubmit }) {
         placeholder="Search for a disease... (e.g. diabetes)"
       />
       <button className='SearchBar__button' onClick={() => onSubmit(query)}>Search</button>
+      {spinning && <div>Loading...</div>}
     </div>
   );
 }

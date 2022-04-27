@@ -1,9 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import React from 'react';
 import './CytoscapeGraph.css';
 import cytoscape from 'cytoscape';
 
 export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
+  const [hideIsolatedNodes, setHideIsolatedNodes] = useState(true);
+  const [showingGraph, setShowingGraph] = useState(false);
+
   useEffect(() => {
       if (drawGraph) {
         var cy = cytoscape({
@@ -58,18 +61,31 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
         }).run();
 
         // Hide the isolated nodes
-        cy.nodes().forEach(function(node) {
-          if (node.degree() === 0) {
-            node.hide();
-          }
-        });
-
+        if (hideIsolatedNodes) {
+          cy.nodes().forEach(function (node) {
+            if (node.degree() === 0) {
+              node.hide();
+            }
+          });
+        }
+        setShowingGraph(true);
         setDrawGraph(false);
-
       }
-  }, [data, drawGraph, setDrawGraph]);
-
+  }, [data, drawGraph, setDrawGraph, hideIsolatedNodes]);
+  // https://reactnative.dev/docs/flexbox
   return (
-    <div id="cy"></div>
+    <div className="CytoscapeGraph__container">
+      <div className='sidebar'>
+        <label>Hide isolated nodes</label>
+        <input type='checkbox' className='checkbox' defaultChecked={hideIsolatedNodes} onChange={() => {
+          setHideIsolatedNodes(!hideIsolatedNodes);
+          if (showingGraph) {
+            // Update the graph
+            setDrawGraph(true);
+          }
+        }} />
+      </div>
+      <div id="cy" className='canvas'></div>
+    </div>
   );
 }
