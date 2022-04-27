@@ -57,9 +57,14 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
           fit: true, // whether to fit the viewport to the graph
         }).run();
 
-        setDrawGraph(false);
+        // Hide the isolated nodes
+        cy.nodes().forEach(function(node) {
+          if (node.degree() === 0) {
+            node.hide();
+          }
+        });
 
-        cy.center();
+        setDrawGraph(false);
 
       }
   }, [data, drawGraph, setDrawGraph]);
