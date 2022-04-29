@@ -1,6 +1,6 @@
-# BioSearch -- An UX for pubmad
+# BioSearch - An UX for pubmad
 
-Make sure to start the pubmad server before running this command:
+Note: this UX uses the server provided by *pubmad*, make sure to start it first.
 
 > npm start
 
@@ -9,6 +9,7 @@ OBIETTIVI:
        rimetti biobert le relazioni rimangono le co-occurrences
 
 - Cliccare nodo grafo e vedere:
+    https://github.com/cytoscape/cytoscape.js-popper
     - Quali sono gli articoli collegati
     - mesh_id
     - Cliccare per espandere il grafo relativo a quel nodo
@@ -19,7 +20,7 @@ OBIETTIVI:
 
 
 
-- Algoritmi di centralità e communities
+- Algoritmi di centralità e communities (=> usare https://github.com/upsetjs/cytoscape.js-bubblesets)
 - Cambiare layout del grafo (spring layout, ...)
 
 - Aggiungere QA model con una specie di chatbot

@@ -16,7 +16,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
               selector: 'node',
               style: {
                 'background-color': '#f37f0d',
-                'label': 'data(label)'
+                'label': 'data(label)',
               }
             },
             {
@@ -40,6 +40,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
             data: {
               id: nodes[i].data.id,
               label: nodes[i].data.mention,
+              pmids: nodes[i].data.pmid,
             },
           });
         }
@@ -59,6 +60,13 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
           name: 'cose',
           fit: true, // whether to fit the viewport to the graph
         }).run();
+
+        cy.on('click', 'node', function(evt){
+          const clicked_node = cy.$id(this.id());
+          // get all the articles associated with this node
+          const pmid_array = getConnectedArticles(clicked_node);
+          
+        });
 
         // Hide the isolated nodes
         if (hideIsolatedNodes) {
@@ -89,4 +97,13 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
       <div id="cy" className='canvas'></div>
     </div>
   );
+}
+
+function getConnectedArticles(node) {
+  const pmids = node.data('pmids');
+  // split pmids into array
+  const pmids_array = pmids.split(',');
+  // remove duplicates
+  const unique_pmids = [...new Set(pmids_array)];
+  return unique_pmids;
 }
