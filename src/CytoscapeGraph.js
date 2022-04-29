@@ -15,7 +15,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
             {
               selector: 'node',
               style: {
-                'background-color': '#f37f0d',
+                'background-color': 'data(background_color)',
                 'label': 'data(label)',
               }
             },
@@ -35,12 +35,21 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
         const nodes = data.elements.nodes
         const edges = data.elements.edges
         for (let i = 0; i < nodes.length; i++) {
+          const is_gene = nodes[i].data.type == 'gene';
+          const is_disease = nodes[i].data.type == 'disease';
+          var background_color = '#000000';
+          if (is_gene) {
+            background_color = '#f37f0d';
+          } else if (is_disease) {
+            background_color = '#FFF500';
+          }
           cy.add({
             group: 'nodes',
             data: {
               id: nodes[i].data.id,
               label: nodes[i].data.mention,
               pmids: nodes[i].data.pmid,
+              background_color: background_color,
             },
           });
         }

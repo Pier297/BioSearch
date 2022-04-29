@@ -9,12 +9,14 @@ OBIETTIVI:
        rimetti biobert le relazioni rimangono le co-occurrences
 
 - Cliccare nodo grafo e vedere:
-    https://github.com/cytoscape/cytoscape.js-popper
+    Dialogo material ui
     - Quali sono gli articoli collegati
     - mesh_id
     - Cliccare per espandere il grafo relativo a quel nodo
 
 - toggle Mostra/Nasconde peso dell'arco come colore Confidence del modello
+
+
 
 - Salvare il grafo in file / Cancellare grafo corrente
 
