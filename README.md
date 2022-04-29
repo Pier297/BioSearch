@@ -5,13 +5,7 @@ Note: this UX uses the server provided by *pubmad*, make sure to start it first.
 > npm start
 
 OBIETTIVI:
-- BUG: se si fa una query usando biobert, poi si toglie biobert e si rifa la query tutto ok, ma se poi
-       rimetti biobert le relazioni rimangono le co-occurrences
-
 - Cliccare nodo grafo e vedere:
-    Dialogo material ui
-    - Quali sono gli articoli collegati
-    - mesh_id
     - Cliccare per espandere il grafo relativo a quel nodo
 
 - toggle Mostra/Nasconde peso dell'arco come colore Confidence del modello

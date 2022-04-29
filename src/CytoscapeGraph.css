@@ -28,3 +28,20 @@
     font-family: inherit;
     color: #6ff1e7;
 }
+
+.articles {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.mesh_link {
+    color: #6ff1e7;
+    text-decoration: none;
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+}

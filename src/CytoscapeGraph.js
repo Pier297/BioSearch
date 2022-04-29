@@ -2,10 +2,34 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import './CytoscapeGraph.css';
 import cytoscape from 'cytoscape';
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root');
+
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+  },
+};
 
 export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
   const [hideIsolatedNodes, setHideIsolatedNodes] = useState(true);
   const [showingGraph, setShowingGraph] = useState(false);
+  const [modalIsOpen, setIsOpen] = useState(false);
+  const [selectedNode, setSelectedNode] = useState(null);
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+  }
 
   useEffect(() => {
       if (drawGraph) {
@@ -72,9 +96,8 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
 
         cy.on('click', 'node', function(evt){
           const clicked_node = cy.$id(this.id());
-          // get all the articles associated with this node
-          const pmid_array = getConnectedArticles(clicked_node);
-          
+          setSelectedNode(clicked_node);
+          openModal()
         });
 
         // Hide the isolated nodes
@@ -104,10 +127,12 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
         }} />
       </div>
       <div id="cy" className='canvas'></div>
+      <NodeModal node={selectedNode} closeModal={closeModal} modalIsOpen={modalIsOpen} />
     </div>
   );
 }
-
+//get all the articles associated with this node
+// const pmid_array = getConnectedArticles(clicked_node);
 function getConnectedArticles(node) {
   const pmids = node.data('pmids');
   // split pmids into array
@@ -115,4 +140,56 @@ function getConnectedArticles(node) {
   // remove duplicates
   const unique_pmids = [...new Set(pmids_array)];
   return unique_pmids;
+}
+
+function NodeModal({ node, closeModal, modalIsOpen}) {
+  let subtitle;
+  let nodeLabel = '';
+  let articles = [];
+  let db = '';
+  let id_value = '';
+  let url = '';
+
+  if (node != null) {
+    nodeLabel = node.data('label');
+    articles = getConnectedArticles(node);
+    let mesh_id = node.data('id');
+    // extract mesh_id after the :
+    const mesh_id_array = mesh_id.split(':');
+    if (mesh_id_array[0] == 'mesh') {
+      db = 'MeSH';
+      id_value = mesh_id_array[1];
+      url = 'https://www.ncbi.nlm.nih.gov/mesh/' + id_value;
+    } else if (mesh_id_array[0] == 'mim') {
+      db = 'MIM';
+      id_value = mesh_id_array[1];
+      url = 'https://omim.org/entry/' + id_value;
+    } else if (mesh_id_array[0] == 'NCBIGene') {
+      db = 'NCBIGene';
+      id_value = mesh_id_array[1];
+      url = 'https://www.ncbi.nlm.nih.gov/gene/' + id_value;
+    }
+  }
+
+  return (
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+      >
+        <h2>{nodeLabel}</h2>
+        <div className='mesh_link'>
+          <h4>{db}:</h4>
+          <a href={url} target="_blank">{id_value}</a>
+        </div>
+        
+        <div className='articles'>
+          <h3>Connected articles:</h3>
+          {articles.map(article => (
+            <a href={`https://www.ncbi.nlm.nih.gov/pubmed/?term=${article}`} target='_blank' rel='noopener noreferrer' key={article}>{article}</a>
+          ))}
+        </div>
+      </Modal>
+  );
 }
