@@ -4,6 +4,16 @@ import './CytoscapeGraph.css';
 import cytoscape from 'cytoscape';
 import Modal from 'react-modal';
 
+import cola from 'cytoscape-cola';
+import cise from 'cytoscape-cise';
+import coseBilkent from 'cytoscape-cose-bilkent';
+
+cytoscape.use( coseBilkent );
+
+cytoscape.use( cise );
+
+cytoscape.use( cola );
+
 Modal.setAppElement('#root');
 
 const customStyles = {
@@ -22,6 +32,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
   const [showingGraph, setShowingGraph] = useState(false);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState(null);
+  const [layout, setLayout] = useState('cose');
 
   function openModal() {
     setIsOpen(true);
@@ -113,7 +124,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
         
         // use spring layout
         cy.layout({
-          name: 'cose',
+          name: layout,
           fit: true, // whether to fit the viewport to the graph
         }).run();
 
@@ -140,7 +151,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
     <div className="CytoscapeGraph__container">
       <div className='sidebar'>
         <h3 className='sidebar_title'>Options:</h3>
-        <label>Hide isolated nodes</label>
+        <label className='label'>Hide isolated nodes</label>
         <input type='checkbox' className='checkbox' defaultChecked={hideIsolatedNodes} onChange={() => {
           setHideIsolatedNodes(!hideIsolatedNodes);
           if (showingGraph) {
@@ -148,6 +159,25 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
             setDrawGraph(true);
           }
         }} />
+        <label className='label'>Layout:</label>
+        <select className='select' defaultValue={layout} onChange={(e) => {
+          setLayout(e.target.value);
+          if (showingGraph) {
+            // Update the graph
+            setDrawGraph(true);
+          }
+        }
+        }>
+          <option value='cose'>Cose</option>
+          <option value='circle'>Circle</option>
+          <option value='grid'>Grid</option>
+          <option value='breadthfirst'>Breadthfirst</option>
+          <option value='concentric'>Concentric</option>
+          <option value='random'>Random</option>
+          <option value='cola'>Cola</option>
+          <option value='cise'>Cise</option>
+          <option value='cose-bilkent'>Cose-Bilkent</option>
+        </select>
       </div>
       <div id="cy" className='canvas'></div>
       <NodeModal node={selectedNode} closeModal={closeModal} modalIsOpen={modalIsOpen} />
