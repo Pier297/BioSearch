@@ -77,6 +77,23 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
             },
           });
         }
+        
+        //find max and min weight
+        let max_weight = 0;
+        let min_weight = 0;
+        if (edges.length > 0) {
+          max_weight = edges[0].data.weight;
+          min_weight = edges[0].data.weight;
+          for (let i = 1; i < edges.length; i++) {
+            if (edges[i].data.weight > max_weight) {
+              max_weight = edges[i].data.weight;
+            }
+            if (edges[i].data.weight < min_weight) {
+              min_weight = edges[i].data.weight;
+            }
+          }
+        }
+
         for (let i = 0; i < edges.length; i++) {
           cy.add({
             group: 'edges',
@@ -86,8 +103,14 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
               target: edges[i].data.target,
               //label: 1
             },
+            style: { // style property overrides 
+              'line-color': `rgb(${255 - edges[i].data.weight * 255}, ${255 - edges[i].data.weight * 255}, ${255 - edges[i].data.weight * 255})`,
+              'width': Math.pow(12, edges[i].data.weight) * (max_weight - min_weight) + min_weight,
+              'opacity': 0.5,
+            }
           });
         }
+        
         // use spring layout
         cy.layout({
           name: 'cose',
