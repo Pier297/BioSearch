@@ -32,7 +32,10 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
   const [showingGraph, setShowingGraph] = useState(false);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState(null);
+  const [edgeModalIsOpen, setEdgeModalIsOpen] = useState(false);
+  const [selectedEdge, setSelectedEdge] = useState(null);
   const [layout, setLayout] = useState('cose');
+
 
   function openModal() {
     setIsOpen(true);
@@ -40,6 +43,14 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
 
   function closeModal() {
     setIsOpen(false);
+  }
+
+  function openEdgeModal() {
+    setEdgeModalIsOpen(true);
+  }
+
+  function closeEdgeModal() {
+    setEdgeModalIsOpen(false);
   }
 
   useEffect(() => {
@@ -134,6 +145,12 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
           openModal()
         });
 
+        cy.on('click', 'edge', function(evt){
+          const clicked_edge = cy.$id(this.id());
+          setSelectedEdge(clicked_edge);
+          openEdgeModal()
+        });
+
         // Hide the isolated nodes
         if (hideIsolatedNodes) {
           cy.nodes().forEach(function (node) {
@@ -181,6 +198,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
       </div>
       <div id="cy" className='canvas'></div>
       <NodeModal node={selectedNode} closeModal={closeModal} modalIsOpen={modalIsOpen} />
+      <EdgeModal edge={selectedEdge} closeModal={closeEdgeModal} modalIsOpen={edgeModalIsOpen} />
     </div>
   );
 }
@@ -240,6 +258,36 @@ function NodeModal({ node, closeModal, modalIsOpen}) {
         <div className='articles'>
           <h3>Connected articles:</h3>
           {articles.map(article => (
+            <a href={`https://www.ncbi.nlm.nih.gov/pubmed/?term=${article}`} target='_blank' rel='noopener noreferrer' key={article}>{article}</a>
+          ))}
+        </div>
+      </Modal>
+  );
+}
+
+function EdgeModal({ edge, closeModal, modalIsOpen}) {
+  let subtitle;
+  let intersection = [];
+
+  if (edge != null) {
+    const source = edge.source();
+    const target = edge.target();
+    const source_articles = getConnectedArticles(source);
+    const target_articles = getConnectedArticles(target);
+    intersection = source_articles.filter(article => target_articles.includes(article));
+  }
+
+  return (
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+      >
+        <h2>Edge</h2>
+        <div className='articles'>
+          <h3>Connected articles:</h3>
+          {intersection.map(article => (
             <a href={`https://www.ncbi.nlm.nih.gov/pubmed/?term=${article}`} target='_blank' rel='noopener noreferrer' key={article}>{article}</a>
           ))}
         </div>

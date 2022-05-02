@@ -7,13 +7,10 @@ Note: this UX uses the server provided by *pubmad*, make sure to start it first.
 OBIETTIVI:
 
 - Algoritmi di centralità e communities (=> usare https://github.com/upsetjs/cytoscape.js-bubblesets)
-
+https://networkx.org/documentation/stable/reference/algorithms/community.html#module-networkx.algorithms.community.louvain
 
 - Cliccare nodo grafo e vedere:
     - Cliccare per espandere il grafo relativo a quel nodo
-
-
-
 
 
 
