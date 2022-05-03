@@ -10,6 +10,7 @@
     "@testing-library/react": "^13.1.1",
     "@testing-library/user-event": "^13.5.0",
     "cytoscape": "^3.21.1",
+    "cytoscape-bubblesets": "^3.1.0",
     "cytoscape-cise": "^1.0.0",
     "cytoscape-cola": "^2.5.1",
     "cytoscape-cose-bilkent": "^4.1.0",

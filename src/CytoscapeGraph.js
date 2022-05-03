@@ -7,6 +7,8 @@ import Modal from 'react-modal';
 import cola from 'cytoscape-cola';
 import cise from 'cytoscape-cise';
 import coseBilkent from 'cytoscape-cose-bilkent';
+import BubbleSets from 'cytoscape-bubblesets';
+cytoscape.use(BubbleSets);
 
 cytoscape.use( coseBilkent );
 
@@ -27,8 +29,9 @@ const customStyles = {
   },
 };
 
-export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
+export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communities }) {
   const [hideIsolatedNodes, setHideIsolatedNodes] = useState(true);
+  const [showCommunities, setShowCommunities] = useState(false);
   const [showingGraph, setShowingGraph] = useState(false);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState(null);
@@ -69,8 +72,8 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
               selector: 'edge',
               style: {
                 'width': 3,
-                'line-color': '#ccc',
-                'target-arrow-color': '#ccc',
+                'line-color': '#2DCBC8',
+                'target-arrow-color': '#2DCBC8',
                 'target-arrow-shape': 'triangle',
                 //'label': 'data(label)', // maps to data.label
               }
@@ -126,9 +129,9 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
               //label: 1
             },
             style: { // style property overrides 
-              'line-color': `rgb(${255 - edges[i].data.weight * 255}, ${255 - edges[i].data.weight * 255}, ${255 - edges[i].data.weight * 255})`,
+              'line-color': '#74B4E3',
               'width': Math.pow(12, edges[i].data.weight) * (max_weight - min_weight) + min_weight,
-              'opacity': 0.5,
+              'opacity': edges[i].data.weight,
             }
           });
         }
@@ -151,6 +154,20 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
           openEdgeModal()
         });
 
+        if (showCommunities == true) {
+          cy.ready(() => {
+            const bb = cy.bubbleSets();
+            communities.forEach(community => {
+              // get the collect of nodes in the community
+              let nodes = cy.nodes().filter(node => {
+                return community.includes(node.id());
+              });
+              bb.addPath(nodes);
+            });
+            //bb.addPath(cy.nodes(), cy.edges(), null);
+          });
+        }
+
         // Hide the isolated nodes
         if (hideIsolatedNodes) {
           cy.nodes().forEach(function (node) {
@@ -168,6 +185,14 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph }) {
     <div className="CytoscapeGraph__container">
       <div className='sidebar'>
         <h3 className='sidebar_title'>Options:</h3>
+        <label className='label'>Show communities</label>
+        <input type='checkbox' checked={showCommunities} onChange={() => {
+          setShowCommunities(!showCommunities);
+          if (showingGraph) {
+            setDrawGraph(true);
+          }
+        } 
+        }/>
         <label className='label'>Hide isolated nodes</label>
         <input type='checkbox' className='checkbox' defaultChecked={hideIsolatedNodes} onChange={() => {
           setHideIsolatedNodes(!hideIsolatedNodes);
