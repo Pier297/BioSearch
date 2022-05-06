@@ -4,6 +4,7 @@ import './CytoscapeGraph.css';
 import cytoscape from 'cytoscape';
 import Modal from 'react-modal';
 
+
 import cola from 'cytoscape-cola';
 import cise from 'cytoscape-cise';
 import coseBilkent from 'cytoscape-cose-bilkent';
@@ -17,6 +18,11 @@ cytoscape.use( cise );
 cytoscape.use( cola );
 
 Modal.setAppElement('#root');
+
+var graphml = require('cytoscape-graphml');
+var jquery = require('jquery');
+graphml(cytoscape, jquery); // register extension
+
 
 const customStyles = {
   content: {
@@ -38,6 +44,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
   const [edgeModalIsOpen, setEdgeModalIsOpen] = useState(false);
   const [selectedEdge, setSelectedEdge] = useState(null);
   const [layout, setLayout] = useState('cose');
+  const [downloadGraph, setDownloadGraph] = useState(false);
 
 
   function openModal() {
@@ -58,7 +65,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
 
   useEffect(() => {
       if (drawGraph) {
-        var cy = cytoscape({
+        let cy = cytoscape({
           container: document.getElementById('cy'),
           style: [
             {
@@ -178,8 +185,39 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
         }
         setShowingGraph(true);
         setDrawGraph(false);
+        function saveAs(blob, filename) {
+          var url = window.URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.style = 'display: none';
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        }
+        if (downloadGraph) {
+          cy.graphml({
+                node: {
+                  css: false,
+                  data: true,
+                  position: true,
+                },
+                edge: {
+                  css: false,
+                  data: true,
+                },
+                layoutBy: "cose" // string of layout name or layout function
+          });
+          let download_graph = cy.graphml();
+          // Save the xlm to a file
+          var blob = new Blob([download_graph], {type: "text/plain;charset=utf-8"});
+          saveAs(blob, "graph.graphml");
+
+          setDownloadGraph(false);
+        }
       }
-  }, [data, drawGraph, setDrawGraph, hideIsolatedNodes]);
+  }, [data, drawGraph, setDrawGraph, hideIsolatedNodes, downloadGraph]);
   // https://reactnative.dev/docs/flexbox
   return (
     <div className="CytoscapeGraph__container">
@@ -220,6 +258,10 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
           <option value='cise'>Cise</option>
           <option value='cose-bilkent'>Cose-Bilkent</option>
         </select>
+        <button className='button' onClick={() => {
+          setDownloadGraph(true);
+          setDrawGraph(true);
+        }}>Export GraphML</button>
       </div>
       <div id="cy" className='canvas'></div>
       <NodeModal node={selectedNode} closeModal={closeModal} modalIsOpen={modalIsOpen} />
