@@ -223,41 +223,48 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
     <div className="CytoscapeGraph__container">
       <div className='sidebar'>
         <h3 className='sidebar_title'>Options:</h3>
-        <label className='label'>Show communities</label>
-        <input type='checkbox' checked={showCommunities} onChange={() => {
-          setShowCommunities(!showCommunities);
-          if (showingGraph) {
-            setDrawGraph(true);
+        <div className='sidebar_box'>
+          <label className='label'>Show communities</label>
+          <input type='checkbox' checked={showCommunities} onChange={() => {
+            setShowCommunities(!showCommunities);
+            if (showingGraph) {
+              setDrawGraph(true);
+            }
           }
-        }
-        } />
-        <label className='label'>Hide isolated nodes</label>
-        <input type='checkbox' className='checkbox' defaultChecked={hideIsolatedNodes} onChange={() => {
-          setHideIsolatedNodes(!hideIsolatedNodes);
-          if (showingGraph) {
-            // Update the graph
-            setDrawGraph(true);
+          } />
+        </div>
+        <div className='sidebar_box'>
+          <label className='label'>Hide isolated nodes</label>
+          <input type='checkbox' className='checkbox' defaultChecked={hideIsolatedNodes} onChange={() => {
+            setHideIsolatedNodes(!hideIsolatedNodes);
+            if (showingGraph) {
+              // Update the graph
+              setDrawGraph(true);
+            }
+          }} />
+        </div>
+        <div className='sidebar_box'>
+          <label className='label'>Layout:</label>
+          <select className='select' defaultValue={layout} onChange={(e) => {
+            setLayout(e.target.value);
+            if (showingGraph) {
+              // Update the graph
+              setDrawGraph(true);
+            }
           }
-        }} />
-        <label className='label'>Layout:</label>
-        <select className='select' defaultValue={layout} onChange={(e) => {
-          setLayout(e.target.value);
-          if (showingGraph) {
-            // Update the graph
-            setDrawGraph(true);
-          }
-        }
-        }>
-          <option value='cose'>Cose</option>
-          <option value='circle'>Circle</option>
-          <option value='grid'>Grid</option>
-          <option value='breadthfirst'>Breadthfirst</option>
-          <option value='concentric'>Concentric</option>
-          <option value='random'>Random</option>
-          <option value='cola'>Cola</option>
-          <option value='cise'>Cise</option>
-          <option value='cose-bilkent'>Cose-Bilkent</option>
-        </select>
+          }>
+            <option value='cose'>Cose</option>
+            <option value='circle'>Circle</option>
+            <option value='grid'>Grid</option>
+            <option value='breadthfirst'>Breadthfirst</option>
+            <option value='concentric'>Concentric</option>
+            <option value='random'>Random</option>
+            <option value='cola'>Cola</option>
+            <option value='cise'>Cise</option>
+            <option value='cose-bilkent'>Cose-Bilkent</option>
+          </select>
+        </div>
+        
         <button className='button' onClick={() => {
           setDownloadGraph(true);
           setDrawGraph(true);

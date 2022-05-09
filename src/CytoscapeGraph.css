@@ -13,10 +13,18 @@
 }
 
 .sidebar {
+    display: flex;
     flex: 2;
     box-shadow: 0 0.5rem 1rem rgba(4, 35, 36, 0.1);
     padding: 0.5rem;
     border-radius: 0.5rem;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.sidebar_box {
+    margin: 5px 0;
 }
 
 .canvas {
@@ -26,7 +34,8 @@
 .sidebar_title {
     font-size: 1.2rem;
     font-family: inherit;
-    color: #6ff1e7;
+    color: #33f3e3;
+    font-weight: bold;
 }
 
 .articles {
@@ -48,4 +57,5 @@
 
 .label {
     font-family: inherit;
+    margin-right: 5px;
 }
