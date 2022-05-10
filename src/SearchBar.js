@@ -4,7 +4,7 @@ import React from 'react';
 
 export default function SearchBar({ onSubmit, spinning }) {
   const [query, setQuery] = useState('diabetes');
-  const [maxPublications, setMaxPublications] = useState(10);
+  const [maxPublications, setMaxPublications] = useState(100);
   const [startYear, setStartYear] = useState(1800);
   const [endYear, setEndYear] = useState(new Date().getFullYear());
   const [useBioBERT, setUseBioBERT] = useState(true);

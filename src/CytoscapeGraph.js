@@ -46,6 +46,8 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
   const [layout, setLayout] = useState('cose');
   const [downloadGraph, setDownloadGraph] = useState(false);
   const [cyObj, setCyObj] = useState(null);
+  const [centralityPercThreshold, setCentralityPercThreshold] = useState(100);
+  const [maxNumNodes, setMaxNumNodes] = useState(-1);
 
   function openModal() {
     setIsOpen(true);
@@ -220,24 +222,61 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
         }
       });
     }
+
+    // Show only the % of most central nodes
+    let nodeMeshToDegree = {};
+    if (centralityPercThreshold !== 100) {
+      cy.nodes().forEach(node => {
+        let centrality = cy.$().degreeCentrality({ 'root': node }).degree;
+        nodeMeshToDegree[node.id()] = centrality;
+      });
+      let sortedNodes = Object.keys(nodeMeshToDegree).sort((a, b) => {
+        return nodeMeshToDegree[a] - nodeMeshToDegree[b];
+      }
+      );
+      let numNodesToHide = Math.floor(sortedNodes.length * (100 - centralityPercThreshold) / 100);
+      if (maxNumNodes >= 0) {
+        // if maxNumNodes is set, hide the nodes that are not the most central
+        numNodesToHide = Math.max(numNodesToHide, sortedNodes.length - maxNumNodes);
+      }
+      for (let i = 0; i < numNodesToHide; i++) {
+        cy.$id(sortedNodes[i]).hide();
+      }
+    }
+
     setCyObj(cy);
     if (data.elements.nodes.length > 0) {
       setShowingGraph(true);
       setRefreshGraph(false);
     }
-  }, [data, hideIsolatedNodes, downloadGraph, setCyObj, communities, showCommunities, layout]);
+  }, [data, hideIsolatedNodes, downloadGraph, setCyObj, communities, showCommunities, layout, refreshGraph, setRefreshGraph, centralityPercThreshold, maxNumNodes]);
 
   return (
     <div className="CytoscapeGraph__container">
       <div className='sidebar'>
         <h3 className='sidebar_title'>Options:</h3>
+        <label className='label'>Filter Graph:</label>
+        <div className='sidebar_box'>
+          <label className='label'>Show % most central:</label>
+          <input type='number' className='percentage_input' value={centralityPercThreshold} onChange={(e) => {
+            setCentralityPercThreshold(e.target.value);
+          }} />
+        </div>
+        <div className='sidebar_box'>
+          <label className='label'>Max num of nodes</label>
+          <input type='number' className='percentage_input' value={maxNumNodes} onChange={(e) => {
+            setMaxNumNodes(e.target.value);
+          }} />
+          <button className='button' onClick={() => {
+            setRefreshGraph(true);
+          }}>Refresh</button>
+        </div>
         <div className='sidebar_box'>
           <label className='label'>Show communities</label>
           <input type='checkbox' checked={showCommunities} onChange={() => {
             setShowCommunities(!showCommunities);
             setRefreshGraph(true);
-          }
-          } />
+          }} />
         </div>
         <div className='sidebar_box'>
           <label className='label'>Hide isolated nodes</label>
@@ -250,8 +289,7 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
           <label className='label'>Layout:</label>
           <select className='select' defaultValue={layout} onChange={(e) => {
             setLayout(e.target.value);
-          }
-          }>
+          }}>
             <option value='cose'>Cose</option>
             <option value='circle'>Circle</option>
             <option value='grid'>Grid</option>

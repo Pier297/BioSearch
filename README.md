@@ -6,10 +6,7 @@ Note: this UX uses the server provided by *pubmad*, make sure to start it first.
 
 OBIETTIVI:
 
-- Mandare il grafo con socket.io ogni volta che processiamo un articolo
-
-
-- Mostrare solo gli X nodi più centrali e i loro vicini
+- Costruire il grafo iterativamente con multiple chiamate al server
 
 - Possibilità di mostrare i vicini a un nodo
 
@@ -21,3 +18,5 @@ OBIETTIVI:
 - Invece di usare bubblesets per le communities possiamo usare i sotto-grafi come nodi
 
 - Importare da graphml
+
+- Mandare il grafo con socket.io ogni volta che processiamo un articolo?
