@@ -48,7 +48,7 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
   const [cyObj, setCyObj] = useState(null);
   const [centralityPercThreshold, setCentralityPercThreshold] = useState(100);
   const [maxNumNodes, setMaxNumNodes] = useState(-1);
-  const [nodeRepulsion, setNodeRepulsion] = useState(1);
+  const [nodeRepulsion, setNodeRepulsion] = useState(4);
 
   function openModal() {
     setIsOpen(true);
@@ -186,7 +186,9 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
     // use spring layout
     cy.layout({
       name: layout,
-      fit: true, // whether to fit the viewport to the graph
+      fit: true,
+      nodeOverlap: nodeRepulsion,
+      animate: false,
     }).run();
 
     cy.on('click', 'node', function (evt) {
@@ -250,7 +252,7 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
       setShowingGraph(true);
       setRefreshGraph(false);
     }
-  }, [data, hideIsolatedNodes, downloadGraph, setCyObj, communities, showCommunities, layout, refreshGraph, setRefreshGraph, centralityPercThreshold, maxNumNodes]);
+  }, [data, hideIsolatedNodes, downloadGraph, setCyObj, communities, showCommunities, layout, refreshGraph, setRefreshGraph, centralityPercThreshold, maxNumNodes, nodeRepulsion]);
 
   return (
     <div className="CytoscapeGraph__container">
@@ -270,8 +272,8 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
           }} />
         </div>
         <div className='sidebar_box'>
-          <label className='label'>Node repulsion</label>
-          <input type="range" value={nodeRepulsion} min="0" max="100" step="1" onChange={(e) => {
+          <label className='label'>Node repulsion: {nodeRepulsion}</label>
+          <input type="range" value={nodeRepulsion} min="1" max="1000" step="1" onChange={(e) => {
             setNodeRepulsion(e.target.value);
           }} />
         </div>
@@ -296,16 +298,13 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
           <label className='label'>Layout:</label>
           <select className='select' defaultValue={layout} onChange={(e) => {
             setLayout(e.target.value);
+            setRefreshGraph(true);
           }}>
             <option value='cose'>Cose</option>
             <option value='circle'>Circle</option>
             <option value='grid'>Grid</option>
-            <option value='breadthfirst'>Breadthfirst</option>
             <option value='concentric'>Concentric</option>
             <option value='random'>Random</option>
-            <option value='cola'>Cola</option>
-            <option value='cise'>Cise</option>
-            <option value='cose-bilkent'>Cose-Bilkent</option>
           </select>
         </div>
         <button disabled={(showingGraph === false)} className='button' onClick={() => {

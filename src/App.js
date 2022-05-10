@@ -4,7 +4,7 @@ import React from 'react';
 import SearchBar from './SearchBar';
 import CytoscapeGraph from './CytoscapeGraph';
 
-function handleSubmit(query, setData, setSpinning, maxPublications, startYear, endYear, useBioBERT, setCommunities, setRefreshGraph) {
+function handleSubmit(query, setData, setSpinning, maxPublications, startYear, endYear, useBioBERT, setCommunities, setRefreshGraph, data) {
   setSpinning(true);
   const useBioBERT_int = useBioBERT ? 1 : 0;
   // POST 127.0.0.1:5000/get_graph
@@ -19,6 +19,7 @@ function handleSubmit(query, setData, setSpinning, maxPublications, startYear, e
       start_year: startYear,
       end_year: endYear,
       use_biobert: useBioBERT_int,
+      data: data,
     }),
   })
     .then(response => response.json())
@@ -47,7 +48,7 @@ function App() {
         <h1 className="AppName">BioSearch</h1>
       </div>
       <div className='Search__container'>
-        <SearchBar onSubmit={(query, maxPublications, startYear, endYear, useBioBERT) => handleSubmit(query, setData, setSpinning, maxPublications, startYear, endYear, useBioBERT, setCommunities, setRefreshGraph)} spinning={spinning} />
+        <SearchBar onSubmit={(query, maxPublications, startYear, endYear, useBioBERT) => handleSubmit(query, setData, setSpinning, maxPublications, startYear, endYear, useBioBERT, setCommunities, setRefreshGraph, data)} spinning={spinning} />
       </div>
       <div className='Content__container'>
         <CytoscapeGraph data={data} setData={setData} communities={communities} refreshGraph={refreshGraph} setRefreshGraph={setRefreshGraph} />

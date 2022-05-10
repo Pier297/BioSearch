@@ -4,7 +4,7 @@ import React from 'react';
 
 export default function SearchBar({ onSubmit, spinning }) {
   const [query, setQuery] = useState('diabetes');
-  const [maxPublications, setMaxPublications] = useState(100);
+  const [maxPublications, setMaxPublications] = useState(10);
   const [startYear, setStartYear] = useState(1800);
   const [endYear, setEndYear] = useState(new Date().getFullYear());
   const [useBioBERT, setUseBioBERT] = useState(true);
@@ -19,6 +19,9 @@ export default function SearchBar({ onSubmit, spinning }) {
           onChange={e => setQuery(e.target.value)}
           placeholder="Search for a disease... (e.g. diabetes)"
         />
+        <div className='spinning-loader'>
+          {spinning && <div className='spinning-loader__spinner'></div>}
+        </div>
         <button className='SearchBar__button' onClick={() => onSubmit(query, maxPublications, startYear, endYear, useBioBERT)}>Search</button>
         {spinning && <div>Loading...</div>}
       </div>

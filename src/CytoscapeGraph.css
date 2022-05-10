@@ -25,6 +25,10 @@
     cursor: pointer;
 }
 
+.button:hover {
+    background-color: #3e8e41;
+}
+
 .button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
@@ -36,6 +40,10 @@
 
 .red {
     background-color: #f44336;
+}
+
+.red:hover {
+    background-color: #932720;
 }
 
 .sidebar {
