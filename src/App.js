@@ -50,7 +50,7 @@ function App() {
         <SearchBar onSubmit={(query, maxPublications, startYear, endYear, useBioBERT) => handleSubmit(query, setData, setDrawGraph, setSpinning, maxPublications, startYear, endYear, useBioBERT, setCommunities)} spinning={spinning} />
       </div>
       <div className='Content__container'>
-        <CytoscapeGraph data={data} drawGraph={drawGraph} setDrawGraph={setDrawGraph} communities={communities} />
+        <CytoscapeGraph data={data} setData={setData} drawGraph={drawGraph} setDrawGraph={setDrawGraph} communities={communities} />
       </div>
     </div>
   );

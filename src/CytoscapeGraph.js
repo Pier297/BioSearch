@@ -35,7 +35,7 @@ const customStyles = {
   },
 };
 
-export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communities }) {
+export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communities, setData }) {
   const [hideIsolatedNodes, setHideIsolatedNodes] = useState(true);
   const [showCommunities, setShowCommunities] = useState(false);
   const [showingGraph, setShowingGraph] = useState(false);
@@ -45,6 +45,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
   const [selectedEdge, setSelectedEdge] = useState(null);
   const [layout, setLayout] = useState('cose');
   const [downloadGraph, setDownloadGraph] = useState(false);
+  const [cyObj, setCyObj] = useState(null);
 
 
   function openModal() {
@@ -62,6 +63,41 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
   function closeEdgeModal() {
     setEdgeModalIsOpen(false);
   }
+
+  // Download graph as a .graphml file
+  useEffect(() => {
+    if (cyObj !== null && downloadGraph) {
+      function saveAs(blob, filename) {
+        var url = window.URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.style = 'display: none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+      cyObj.graphml({
+        node: {
+          css: false,
+          data: true,
+          position: true,
+        },
+        edge: {
+          css: false,
+          data: true,
+        },
+        layoutBy: "cose" // string of layout name or layout function
+      });
+      let download_graph = cyObj.graphml();
+      // Save the xlm to a file
+      var blob = new Blob([download_graph], { type: "text/plain;charset=utf-8" });
+      saveAs(blob, "graph.graphml");
+
+      setDownloadGraph(false);
+    }
+  }, [downloadGraph, cyObj]);
 
   useEffect(() => {
     if (drawGraph) {
@@ -183,41 +219,11 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
           }
         });
       }
+      setCyObj(cy);
       setShowingGraph(true);
       setDrawGraph(false);
-      function saveAs(blob, filename) {
-        var url = window.URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.style = 'display: none';
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      }
-      if (downloadGraph) {
-        cy.graphml({
-          node: {
-            css: false,
-            data: true,
-            position: true,
-          },
-          edge: {
-            css: false,
-            data: true,
-          },
-          layoutBy: "cose" // string of layout name or layout function
-        });
-        let download_graph = cy.graphml();
-        // Save the xlm to a file
-        var blob = new Blob([download_graph], { type: "text/plain;charset=utf-8" });
-        saveAs(blob, "graph.graphml");
-
-        setDownloadGraph(false);
-      }
     }
-  }, [data, drawGraph, setDrawGraph, hideIsolatedNodes, downloadGraph]);
+  }, [data, drawGraph, setDrawGraph, hideIsolatedNodes, downloadGraph, setCyObj, communities, showCommunities, layout]);
   // https://reactnative.dev/docs/flexbox
   return (
     <div className="CytoscapeGraph__container">
@@ -267,8 +273,14 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
         
         <button className='button' onClick={() => {
           setDownloadGraph(true);
-          setDrawGraph(true);
         }}>Export GraphML</button>
+        <button className='button red' onClick={() => {
+          // Reset the graph
+          setData({ elements: { nodes: [], edges: [] } });
+          setCyObj(null);
+          setShowingGraph(true);
+          setDrawGraph(true);
+        }}>Reset</button>
       </div>
       <div id="cy" className='canvas'></div>
       <NodeModal node={selectedNode} closeModal={closeModal} modalIsOpen={modalIsOpen} />

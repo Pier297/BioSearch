@@ -6,11 +6,14 @@ Note: this UX uses the server provided by *pubmad*, make sure to start it first.
 
 OBIETTIVI:
 
-- Cliccare per espandere il grafo relativo a quel nodo
+- Mandare il grafo con socket.io ogni volta che processiamo un articolo
 
+- Mostrare solo gli X nodi più centrali e i loro vicini
 
-- Aggiungere QA model con una specie di chatbot
+- Possibilità di mostrare i vicini a un nodo
 
-- toggle Mostra/Nasconde peso dell'arco come colore Confidence del modello
+- Possibilità di mostrare tutti i nodi di un certo tipo, esempio: Mostra tutti i nodi drug e le loro relazioni
+    - Cioè in pratica mostra tutti i nodi raggiungibili partendo da una drug
 
-- Salvare il grafo in file / Cancellare grafo corrente
+- Aumentare / Diminuire dimensione dei nodi
+- Importare da graphml
