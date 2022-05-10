@@ -15,8 +15,8 @@ OBIETTIVI:
 
 - Aumentare / Diminuire dimensione dei nodi
 
+- Aumentare distanza tra nodi
+
 - Invece di usare bubblesets per le communities possiamo usare i sotto-grafi come nodi
 
 - Importare da graphml
-
-- Mandare il grafo con socket.io ogni volta che processiamo un articolo?

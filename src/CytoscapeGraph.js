@@ -48,6 +48,7 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
   const [cyObj, setCyObj] = useState(null);
   const [centralityPercThreshold, setCentralityPercThreshold] = useState(100);
   const [maxNumNodes, setMaxNumNodes] = useState(-1);
+  const [nodeRepulsion, setNodeRepulsion] = useState(1);
 
   function openModal() {
     setIsOpen(true);
@@ -255,7 +256,7 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
     <div className="CytoscapeGraph__container">
       <div className='sidebar'>
         <h3 className='sidebar_title'>Options:</h3>
-        <label className='label'>Filter Graph:</label>
+        <label className='label'><b>Filter Graph:</b></label>
         <div className='sidebar_box'>
           <label className='label'>Show % most central:</label>
           <input type='number' className='percentage_input' value={centralityPercThreshold} onChange={(e) => {
@@ -267,10 +268,16 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
           <input type='number' className='percentage_input' value={maxNumNodes} onChange={(e) => {
             setMaxNumNodes(e.target.value);
           }} />
-          <button className='button' onClick={() => {
+        </div>
+        <div className='sidebar_box'>
+          <label className='label'>Node repulsion</label>
+          <input type="range" value={nodeRepulsion} min="0" max="100" step="1" onChange={(e) => {
+            setNodeRepulsion(e.target.value);
+          }} />
+        </div>
+        <button className='button' onClick={() => {
             setRefreshGraph(true);
           }}>Refresh</button>
-        </div>
         <div className='sidebar_box'>
           <label className='label'>Show communities</label>
           <input type='checkbox' checked={showCommunities} onChange={() => {
