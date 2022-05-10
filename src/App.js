@@ -4,7 +4,7 @@ import React from 'react';
 import SearchBar from './SearchBar';
 import CytoscapeGraph from './CytoscapeGraph';
 
-function handleSubmit(query, setData, setDrawGraph, setSpinning, maxPublications, startYear, endYear, useBioBERT, setCommunities) {
+function handleSubmit(query, setData, setSpinning, maxPublications, startYear, endYear, useBioBERT, setCommunities, setRefreshGraph) {
   setSpinning(true);
   const useBioBERT_int = useBioBERT ? 1 : 0;
   // POST 127.0.0.1:5000/get_graph
@@ -28,15 +28,15 @@ function handleSubmit(query, setData, setDrawGraph, setSpinning, maxPublications
       cy_data = JSON.parse(cy_data);
       const communities = data['communities'];
       setData(cy_data);
+      setRefreshGraph(true);
       setCommunities(communities);
-      setDrawGraph(true);
       setSpinning(false);
     });
 }
 
 function App() {
-  const [data, setData] = useState([]);
-  const [drawGraph, setDrawGraph] = useState(false);
+  const [data, setData] = useState({ elements: { nodes: [], edges: [] } });
+  const [refreshGraph, setRefreshGraph] = useState(false);
   const [communities, setCommunities] = useState([]);
   // whether we're waiting for the server to respond
   const [spinning, setSpinning] = useState(false);
@@ -47,10 +47,10 @@ function App() {
         <h1 className="AppName">BioSearch</h1>
       </div>
       <div className='Search__container'>
-        <SearchBar onSubmit={(query, maxPublications, startYear, endYear, useBioBERT) => handleSubmit(query, setData, setDrawGraph, setSpinning, maxPublications, startYear, endYear, useBioBERT, setCommunities)} spinning={spinning} />
+        <SearchBar onSubmit={(query, maxPublications, startYear, endYear, useBioBERT) => handleSubmit(query, setData, setSpinning, maxPublications, startYear, endYear, useBioBERT, setCommunities, setRefreshGraph)} spinning={spinning} />
       </div>
       <div className='Content__container'>
-        <CytoscapeGraph data={data} setData={setData} drawGraph={drawGraph} setDrawGraph={setDrawGraph} communities={communities} />
+        <CytoscapeGraph data={data} setData={setData} communities={communities} refreshGraph={refreshGraph} setRefreshGraph={setRefreshGraph} />
       </div>
     </div>
   );

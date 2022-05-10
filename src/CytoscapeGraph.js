@@ -35,7 +35,7 @@ const customStyles = {
   },
 };
 
-export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communities, setData }) {
+export default function CytoscapeGraph({ data, communities, setData, refreshGraph, setRefreshGraph }) {
   const [hideIsolatedNodes, setHideIsolatedNodes] = useState(true);
   const [showCommunities, setShowCommunities] = useState(false);
   const [showingGraph, setShowingGraph] = useState(false);
@@ -46,7 +46,6 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
   const [layout, setLayout] = useState('cose');
   const [downloadGraph, setDownloadGraph] = useState(false);
   const [cyObj, setCyObj] = useState(null);
-
 
   function openModal() {
     setIsOpen(true);
@@ -100,131 +99,134 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
   }, [downloadGraph, cyObj]);
 
   useEffect(() => {
-    if (drawGraph) {
-      let cy = cytoscape({
-        container: document.getElementById('cy'),
-        style: [
-          {
-            selector: 'node',
-            style: {
-              'background-color': 'data(background_color)',
-              'label': 'data(label)',
-            }
-          },
-          {
-            selector: 'edge',
-            style: {
-              'width': 3,
-              'line-color': '#2DCBC8',
-              'target-arrow-color': '#2DCBC8',
-              'target-arrow-shape': 'triangle',
-              //'label': 'data(label)', // maps to data.label
-            }
-          }
-        ],
-        elements: []
-      });
-      const nodes = data.elements.nodes
-      const edges = data.elements.edges
-      for (let i = 0; i < nodes.length; i++) {
-        const is_gene = nodes[i].data.type === 'gene';
-        const is_disease = nodes[i].data.type === 'disease';
-        var background_color = '#000000';
-        if (is_gene) {
-          background_color = '#f37f0d';
-        } else if (is_disease) {
-          background_color = '#FFF500';
-        }
-        cy.add({
-          group: 'nodes',
-          data: {
-            id: nodes[i].data.id,
-            label: nodes[i].data.mention,
-            pmids: nodes[i].data.pmid,
-            background_color: background_color,
-          },
-        });
-      }
-
-      //find max and min weight
-      let max_weight = 0;
-      let min_weight = 0;
-      if (edges.length > 0) {
-        max_weight = edges[0].data.weight;
-        min_weight = edges[0].data.weight;
-        for (let i = 1; i < edges.length; i++) {
-          if (edges[i].data.weight > max_weight) {
-            max_weight = edges[i].data.weight;
-          }
-          if (edges[i].data.weight < min_weight) {
-            min_weight = edges[i].data.weight;
-          }
-        }
-      }
-
-      for (let i = 0; i < edges.length; i++) {
-        cy.add({
-          group: 'edges',
-          data: {
-            id: edges[i].data.id,
-            source: edges[i].data.source,
-            target: edges[i].data.target,
-            //label: 1
-          },
-          style: { // style property overrides 
-            'line-color': '#74B4E3',
-            'width': Math.pow(12, edges[i].data.weight) * (max_weight - min_weight) + min_weight,
-            'opacity': edges[i].data.weight,
-          }
-        });
-      }
-
-      // use spring layout
-      cy.layout({
-        name: layout,
-        fit: true, // whether to fit the viewport to the graph
-      }).run();
-
-      cy.on('click', 'node', function (evt) {
-        const clicked_node = cy.$id(this.id());
-        setSelectedNode(clicked_node);
-        openModal()
-      });
-
-      cy.on('click', 'edge', function (evt) {
-        const clicked_edge = cy.$id(this.id());
-        setSelectedEdge(clicked_edge);
-        openEdgeModal()
-      });
-
-      if (showCommunities === true) {
-        cy.ready(() => {
-          const bb = cy.bubbleSets();
-          communities.forEach(community => {
-            // get the collect of nodes in the community
-            let nodes = cy.nodes().filter(node => {
-              return community.includes(node.id());
-            });
-            bb.addPath(nodes);
-          });
-          //bb.addPath(cy.nodes(), cy.edges(), null);
-        });
-      }
-
-      // Hide the isolated nodes
-      if (hideIsolatedNodes) {
-        cy.nodes().forEach(function (node) {
-          if (node.degree() === 0) {
-            node.hide();
-          }
-        });
-      }
-      setCyObj(cy);
-      setShowingGraph(true);
-      setDrawGraph(false);
+    if (refreshGraph === false) {
+      return;
     }
-  }, [data, drawGraph, setDrawGraph, hideIsolatedNodes, downloadGraph, setCyObj, communities, showCommunities, layout]);
-  // https://reactnative.dev/docs/flexbox
+    let cy = cytoscape({
+      container: document.getElementById('cy'),
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'background-color': 'data(background_color)',
+            'label': 'data(label)',
+          }
+        },
+        {
+          selector: 'edge',
+          style: {
+            'width': 3,
+            'line-color': '#2DCBC8',
+            'target-arrow-color': '#2DCBC8',
+            'target-arrow-shape': 'triangle',
+            //'label': 'data(label)', // maps to data.label
+          }
+        }
+      ],
+      elements: []
+    });
+    const nodes = data.elements.nodes
+    const edges = data.elements.edges
+    for (let i = 0; i < nodes.length; i++) {
+      const is_gene = nodes[i].data.type === 'gene';
+      const is_disease = nodes[i].data.type === 'disease';
+      var background_color = '#000000';
+      if (is_gene) {
+        background_color = '#f37f0d';
+      } else if (is_disease) {
+        background_color = '#FFF500';
+      }
+      cy.add({
+        group: 'nodes',
+        data: {
+          id: nodes[i].data.id,
+          label: nodes[i].data.mention,
+          pmids: nodes[i].data.pmid,
+          background_color: background_color,
+        },
+      });
+    }
+
+    //find max and min weight
+    let max_weight = 0;
+    let min_weight = 0;
+    if (edges.length > 0) {
+      max_weight = edges[0].data.weight;
+      min_weight = edges[0].data.weight;
+      for (let i = 1; i < edges.length; i++) {
+        if (edges[i].data.weight > max_weight) {
+          max_weight = edges[i].data.weight;
+        }
+        if (edges[i].data.weight < min_weight) {
+          min_weight = edges[i].data.weight;
+        }
+      }
+    }
+
+    for (let i = 0; i < edges.length; i++) {
+      cy.add({
+        group: 'edges',
+        data: {
+          id: edges[i].data.id,
+          source: edges[i].data.source,
+          target: edges[i].data.target,
+          //label: 1
+        },
+        style: { // style property overrides 
+          'line-color': '#74B4E3',
+          'width': Math.pow(12, edges[i].data.weight) * (max_weight - min_weight) + min_weight,
+          'opacity': edges[i].data.weight,
+        }
+      });
+    }
+
+    // use spring layout
+    cy.layout({
+      name: layout,
+      fit: true, // whether to fit the viewport to the graph
+    }).run();
+
+    cy.on('click', 'node', function (evt) {
+      const clicked_node = cy.$id(this.id());
+      setSelectedNode(clicked_node);
+      openModal()
+    });
+
+    cy.on('click', 'edge', function (evt) {
+      const clicked_edge = cy.$id(this.id());
+      setSelectedEdge(clicked_edge);
+      openEdgeModal()
+    });
+
+    if (showCommunities === true) {
+      cy.ready(() => {
+        const bb = cy.bubbleSets();
+        communities.forEach(community => {
+          // get the collect of nodes in the community
+          let nodes = cy.nodes().filter(node => {
+            return community.includes(node.id());
+          });
+          bb.addPath(nodes);
+        });
+        //bb.addPath(cy.nodes(), cy.edges(), null);
+      });
+    }
+
+    // Hide the isolated nodes
+    if (hideIsolatedNodes) {
+      cy.nodes().forEach(function (node) {
+        if (node.degree() === 0) {
+          node.hide();
+        }
+      });
+    }
+    setCyObj(cy);
+    if (data.elements.nodes.length > 0) {
+      setShowingGraph(true);
+      setRefreshGraph(false);
+    }
+  }, [data, hideIsolatedNodes, downloadGraph, setCyObj, communities, showCommunities, layout]);
+
   return (
     <div className="CytoscapeGraph__container">
       <div className='sidebar'>
@@ -233,9 +235,7 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
           <label className='label'>Show communities</label>
           <input type='checkbox' checked={showCommunities} onChange={() => {
             setShowCommunities(!showCommunities);
-            if (showingGraph) {
-              setDrawGraph(true);
-            }
+            setRefreshGraph(true);
           }
           } />
         </div>
@@ -243,20 +243,13 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
           <label className='label'>Hide isolated nodes</label>
           <input type='checkbox' className='checkbox' defaultChecked={hideIsolatedNodes} onChange={() => {
             setHideIsolatedNodes(!hideIsolatedNodes);
-            if (showingGraph) {
-              // Update the graph
-              setDrawGraph(true);
-            }
+            setRefreshGraph(true);
           }} />
         </div>
         <div className='sidebar_box'>
           <label className='label'>Layout:</label>
           <select className='select' defaultValue={layout} onChange={(e) => {
             setLayout(e.target.value);
-            if (showingGraph) {
-              // Update the graph
-              setDrawGraph(true);
-            }
           }
           }>
             <option value='cose'>Cose</option>
@@ -270,16 +263,15 @@ export default function CytoscapeGraph({ data, drawGraph, setDrawGraph, communit
             <option value='cose-bilkent'>Cose-Bilkent</option>
           </select>
         </div>
-        
-        <button className='button' onClick={() => {
+        <button disabled={(showingGraph === false)} className='button' onClick={() => {
           setDownloadGraph(true);
         }}>Export GraphML</button>
-        <button className='button red' onClick={() => {
+        <button disabled={(showingGraph === false)} className='button red' onClick={() => {
           // Reset the graph
           setData({ elements: { nodes: [], edges: [] } });
           setCyObj(null);
-          setShowingGraph(true);
-          setDrawGraph(true);
+          setRefreshGraph(true);
+          setShowingGraph(false);
         }}>Reset</button>
       </div>
       <div id="cy" className='canvas'></div>

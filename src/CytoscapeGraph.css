@@ -25,6 +25,11 @@
     cursor: pointer;
 }
 
+.button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
 .red {
     background-color: #f44336;
 }

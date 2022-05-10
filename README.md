@@ -8,6 +8,7 @@ OBIETTIVI:
 
 - Mandare il grafo con socket.io ogni volta che processiamo un articolo
 
+
 - Mostrare solo gli X nodi più centrali e i loro vicini
 
 - Possibilità di mostrare i vicini a un nodo
@@ -16,4 +17,7 @@ OBIETTIVI:
     - Cioè in pratica mostra tutti i nodi raggiungibili partendo da una drug
 
 - Aumentare / Diminuire dimensione dei nodi
+
+- Invece di usare bubblesets per le communities possiamo usare i sotto-grafi come nodi
+
 - Importare da graphml
