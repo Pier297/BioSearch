@@ -49,6 +49,7 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
   const [centralityPercThreshold, setCentralityPercThreshold] = useState(100);
   const [maxNumNodes, setMaxNumNodes] = useState(-1);
   const [nodeRepulsion, setNodeRepulsion] = useState(4);
+  const [categoriesShown, setCategoriesShown] = useState('all');
 
   function openModal() {
     setIsOpen(true);
@@ -146,6 +147,7 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
           label: nodes[i].data.mention,
           pmids: nodes[i].data.pmid,
           background_color: background_color,
+          type: nodes[i].data.type,
         },
       });
     }
@@ -188,6 +190,7 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
       name: layout,
       fit: true,
       nodeOverlap: nodeRepulsion,
+      idealEdgeLength: 16,
       animate: false,
     }).run();
 
@@ -226,6 +229,16 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
       });
     }
 
+    // Only show nodes of type = categoriesShown
+    if (categoriesShown !== 'all') {
+      cy.nodes().forEach(function (node) {
+        console.log(node.data('type'));
+        if (node.data('type') !== categoriesShown) {
+          node.hide();
+        }
+      });
+    }
+
     // Show only the % of most central nodes
     let nodeMeshToDegree = {};
     if (centralityPercThreshold !== 100) {
@@ -252,13 +265,26 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
       setShowingGraph(true);
       setRefreshGraph(false);
     }
-  }, [data, hideIsolatedNodes, downloadGraph, setCyObj, communities, showCommunities, layout, refreshGraph, setRefreshGraph, centralityPercThreshold, maxNumNodes, nodeRepulsion]);
+  }, [data, hideIsolatedNodes, categoriesShown, downloadGraph, setCyObj, communities, showCommunities, layout, refreshGraph, setRefreshGraph, centralityPercThreshold, maxNumNodes, nodeRepulsion]);
 
   return (
     <div className="CytoscapeGraph__container">
       <div className='sidebar'>
         <h3 className='sidebar_title'>Options:</h3>
         <label className='label'><b>Filter Graph:</b></label>
+        <div className='sidebar_box'>
+          <label className='label'>Show categories</label>
+          <select className='select' onChange={(e) => {
+            console.log(e.target.value);
+            setCategoriesShown(e.target.value);
+            setRefreshGraph(true);
+          }} value={categoriesShown}>
+            <option value='all'>All</option>
+            <option value='gene'>Gene</option>
+            <option value='disease'>Disease</option>
+            <option value='drug'>Drug</option>
+          </select>
+        </div>
         <div className='sidebar_box'>
           <label className='label'>Show % most central:</label>
           <input type='number' className='percentage_input' value={centralityPercThreshold} onChange={(e) => {
@@ -272,8 +298,8 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
           }} />
         </div>
         <div className='sidebar_box'>
-          <label className='label'>Node repulsion: {nodeRepulsion}</label>
-          <input type="range" value={nodeRepulsion} min="1" max="1000" step="1" onChange={(e) => {
+          <label className='label'>Node dist: {nodeRepulsion}</label>
+          <input type="range" value={nodeRepulsion} min="1" max="30" step="1" onChange={(e) => {
             setNodeRepulsion(e.target.value);
           }} />
         </div>
@@ -313,6 +339,7 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
         <button disabled={(showingGraph === false)} className='button red' onClick={() => {
           // Reset the graph
           setData({ elements: { nodes: [], edges: [] } });
+          setCategoriesShown('all');
           setCyObj(null);
           setRefreshGraph(true);
           setShowingGraph(false);
