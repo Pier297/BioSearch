@@ -32,6 +32,10 @@ const customStyles = {
     bottom: 'auto',
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
+    // https://github.com/reactjs/react-modal/issues/283
+    maxHeight: '90vh',
+    overflowY: 'auto',
+    width: '40vw',
   },
 };
 
@@ -176,6 +180,7 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
           id: edges[i].data.id,
           source: edges[i].data.source,
           target: edges[i].data.target,
+          weight: edges[i].data.weight,
           //label: 1
         },
         style: { // style property overrides 
@@ -362,9 +367,26 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
           setRefreshGraph(true);
           setShowingGraph(false);
         }}>Reset</button>
+        <div>
+        <p>Node type legend:</p>
+        <div className='legend'>
+          <div className='legend_item'>
+            <div className='legend_round_item_icon' style={{ backgroundColor: '#f37f0d' }}></div>
+            <div className='legend_item_text'>Gene</div>
+          </div>
+          <div className='legend_item'>
+            <div className='legend_round_item_icon' style={{ backgroundColor: '#FFF500' }}></div>
+            <div className='legend_item_text'>Disease</div>
+          </div>
+          <div className='legend_item'>
+            <div className='legend_round_item_icon' style={{ backgroundColor: '#000000' }}></div>
+            <div className='legend_item_text'>Drug</div>
+          </div>
+        </div>
+      </div>
       </div>
       <div id="cy" className='canvas'></div>
-      <NodeModal node={selectedNode} closeModal={closeModal} modalIsOpen={modalIsOpen} />
+      <NodeModal node={selectedNode} closeModal={closeModal} modalIsOpen={modalIsOpen} cyObj={cyObj} />
       <EdgeModal edge={selectedEdge} closeModal={closeEdgeModal} modalIsOpen={edgeModalIsOpen} />
     </div>
   );
@@ -380,14 +402,17 @@ function getConnectedArticles(node) {
   return unique_pmids;
 }
 
-function NodeModal({ node, closeModal, modalIsOpen }) {
+function NodeModal({ node, closeModal, modalIsOpen, cyObj }) {
+  const [searchTargetType, setSearchTargetType] = useState('-');
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [paths, setPaths] = useState([]);
   let nodeLabel = '';
   let articles = [];
   let db = '';
   let id_value = '';
   let url = '';
 
-  if (node != null) {
+  if (node !== null) {
     nodeLabel = node.data('label');
     articles = getConnectedArticles(node);
     let mesh_id = node.data('id');
@@ -407,11 +432,17 @@ function NodeModal({ node, closeModal, modalIsOpen }) {
       url = 'https://www.ncbi.nlm.nih.gov/gene/' + id_value;
     }
   }
+  
 
   return (
     <Modal
       isOpen={modalIsOpen}
-      onRequestClose={closeModal}
+      onRequestClose={() => {
+        setSearchTargetType('-');
+        setSelectedNode(null);
+        setPaths([]);
+        closeModal();
+      }}
       style={customStyles}
       contentLabel="Example Modal"
     >
@@ -419,6 +450,63 @@ function NodeModal({ node, closeModal, modalIsOpen }) {
       <div className='mesh_link'>
         <h4>{db}:</h4>
         <a href={url} target="_blank">{id_value}</a>
+      </div>
+
+      <div>
+        <h3>Search paths:</h3>
+        <p>Towards nodes of type:</p>
+        <select value={searchTargetType} onChange={(e) => {
+          setSearchTargetType(e.target.value);
+        }}>
+          <option value='-'>-</option>
+          <option value='gene'>Gene</option>
+          <option value='disease'>Disease</option>
+          <option value='drug'>Drug</option>
+        </select>
+        <button onClick={() => {
+          if (searchTargetType !== '-') {
+            const target_type = searchTargetType;
+            console.log(target_type);
+            // Find all the paths starting from selectedNode and ending with a node of type target_type
+            const dijktra = cyObj.elements().dijkstra(node);
+            let paths = [];
+            cyObj.elements().forEach((element) => {
+              if (element.data('type') === target_type && element.data('id') !== node.data('id')) {
+                paths.push(dijktra.pathTo(element));
+              }
+            });
+            // Sort the paths by length
+            paths.sort((a, b) => {
+              return a.length - b.length;
+            });
+            setPaths(paths);
+          }
+        }}>Search</button>
+        <button onClick={() => {
+          setSearchTargetType('-');
+          setPaths([]);
+        }}>Clear</button>
+      </div>
+      <div>
+        {paths.length > 0 && <h3>Paths:</h3>}
+        {paths.map((path, index) => {
+          return (
+            <div key={index}>
+              <h4>Path {index + 1}:</h4>
+              <ul>
+                {path.map((element, j) => {
+                  if (j % 2 === 0) {
+                    return (
+                      <li key={j}>{element.data('label')}</li>
+                    );
+                  } else {
+                    return null;
+                  }
+                })}
+              </ul>
+            </div>
+          );
+        })}
       </div>
 
       <div className='articles'>
@@ -433,6 +521,12 @@ function NodeModal({ node, closeModal, modalIsOpen }) {
 
 function EdgeModal({ edge, closeModal, modalIsOpen }) {
   let intersection = [];
+
+  if (edge === null) {
+    return null;
+  }
+
+  let weight = edge.data('weight').toFixed(2);
 
   if (edge != null) {
     const source = edge.source();
@@ -449,7 +543,7 @@ function EdgeModal({ edge, closeModal, modalIsOpen }) {
       style={customStyles}
       contentLabel="Example Modal"
     >
-      <h2>Edge</h2>
+      <h2>Edge Probability = {weight}</h2>
       <div className='articles'>
         <h3>Connected articles:</h3>
         {intersection.map(article => (

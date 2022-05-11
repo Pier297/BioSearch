@@ -6,23 +6,21 @@ Note: this UX uses the server provided by *pubmad*, make sure to start it first.
 
 OBIETTIVI:
 
-- Search:
-    - Clicco su un nodo e nel modal c'è la possibilità di cercare:
-        - Cammini verso nodi di una certa categoria (li posso ordinare per Probabilità
-           o per distanza)
-        - Cammino verso un nodo specifico (mettere un select con search per categoria e nome)
+- Tenere un'altra lista di nodi visualizzati da passare a cytoscape così che il rendering è più veloce
 
-
-
-- Possibilità di mostrare i vicini a un nodo
-
-- Possibilità di mostrare tutti i nodi di un certo tipo, esempio: Mostra tutti i nodi drug e le loro relazioni
-    - Cioè in pratica mostra tutti i nodi raggiungibili partendo da una drug
-
-- Aumentare / Diminuire dimensione dei nodi
-
-- Invece di usare bubblesets per le communities possiamo usare i sotto-grafi come nodi
+- Premi barra spaziatrice per espandere il grafo con tutti i vicini ai nodi correnti
 
 - Importare da graphml
 
 - Tasto reset filtri
+
+- Mettere lo spinner sopra al tasto search
+
+- Dato un Path poter visualizzarlo nel grafo
+
+- Aumentare / Diminuire dimensione dei nodi
+
+- Cammino verso un nodo specifico (cerca per nome)
+Usare: https://react-select.com/home
+
+- Invece di usare bubblesets per le communities possiamo usare i sotto-grafi come nodi

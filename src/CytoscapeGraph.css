@@ -25,6 +25,31 @@
     cursor: pointer;
 }
 
+.legend {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: left;
+    margin-top: 10px;
+}
+
+.legend_item {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: left;
+    margin: 5px;
+}
+
+.legend_round_item_icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
 .button:hover {
     background-color: #3e8e41;
 }
