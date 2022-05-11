@@ -50,6 +50,7 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
   const [maxNumNodes, setMaxNumNodes] = useState(-1);
   const [nodeRepulsion, setNodeRepulsion] = useState(4);
   const [categoriesShown, setCategoriesShown] = useState('all');
+  const [filterByName, setFilterByName] = useState('');
 
   function openModal() {
     setIsOpen(true);
@@ -229,6 +230,16 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
       });
     }
 
+    // Filter by name
+    if (filterByName !== '') {
+      cy.nodes().forEach(function (node) {
+        console.log(node.data('label'))
+        if (!node.data('label').toLowerCase().includes(filterByName.toLowerCase())) {
+          node.hide();
+        }
+      });
+    }
+
     // Only show nodes of type = categoriesShown
     if (categoriesShown !== 'all') {
       cy.nodes().forEach(function (node) {
@@ -265,13 +276,19 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
       setShowingGraph(true);
       setRefreshGraph(false);
     }
-  }, [data, hideIsolatedNodes, categoriesShown, downloadGraph, setCyObj, communities, showCommunities, layout, refreshGraph, setRefreshGraph, centralityPercThreshold, maxNumNodes, nodeRepulsion]);
+  }, [data, hideIsolatedNodes, filterByName, categoriesShown, downloadGraph, setCyObj, communities, showCommunities, layout, refreshGraph, setRefreshGraph, centralityPercThreshold, maxNumNodes, nodeRepulsion]);
 
   return (
     <div className="CytoscapeGraph__container">
       <div className='sidebar'>
         <h3 className='sidebar_title'>Options:</h3>
         <label className='label'><b>Filter Graph:</b></label>
+        <div className='sidebar_box'>
+          <input type='text' className='input' placeholder='Search by name...' onChange={(e) => {
+            setFilterByName(e.target.value);
+            setRefreshGraph(true);
+          }} value={filterByName} />
+        </div>
         <div className='sidebar_box'>
           <label className='label'>Show categories</label>
           <select className='select' onChange={(e) => {
@@ -340,6 +357,7 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
           // Reset the graph
           setData({ elements: { nodes: [], edges: [] } });
           setCategoriesShown('all');
+          setFilterByName('');
           setCyObj(null);
           setRefreshGraph(true);
           setShowingGraph(false);

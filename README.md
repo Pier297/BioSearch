@@ -6,8 +6,6 @@ Note: this UX uses the server provided by *pubmad*, make sure to start it first.
 
 OBIETTIVI:
 
-- Filtro per nome sul nodo
-
 - Search:
     - Clicco su un nodo e nel modal c'è la possibilità di cercare:
         - Cammini verso nodi di una certa categoria (li posso ordinare per Probabilità
@@ -26,3 +24,5 @@ OBIETTIVI:
 - Invece di usare bubblesets per le communities possiamo usare i sotto-grafi come nodi
 
 - Importare da graphml
+
+- Tasto reset filtri
