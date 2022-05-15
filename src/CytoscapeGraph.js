@@ -51,7 +51,7 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
   const [downloadGraph, setDownloadGraph] = useState(false);
   const [cyObj, setCyObj] = useState(null);
   const [centralityPercThreshold, setCentralityPercThreshold] = useState(100);
-  const [maxNumNodes, setMaxNumNodes] = useState(-1);
+  const [maxNumNodes, setMaxNumNodes] = useState(100);
   const [nodeRepulsion, setNodeRepulsion] = useState(4);
   const [categoriesShown, setCategoriesShown] = useState('all');
   const [filterByName, setFilterByName] = useState('');
@@ -291,7 +291,6 @@ export default function CytoscapeGraph({ data, communities, setData, refreshGrap
         <div className='sidebar_box'>
           <input type='text' className='input' placeholder='Search by name...' onChange={(e) => {
             setFilterByName(e.target.value);
-            setRefreshGraph(true);
           }} value={filterByName} />
         </div>
         <div className='sidebar_box'>
@@ -411,9 +410,11 @@ function NodeModal({ node, closeModal, modalIsOpen, cyObj }) {
   let db = '';
   let id_value = '';
   let url = '';
+  let type = '';
 
   if (node !== null) {
     nodeLabel = node.data('label');
+    type = node.data('type');
     articles = getConnectedArticles(node);
     let mesh_id = node.data('id');
     // extract mesh_id after the :
@@ -446,7 +447,7 @@ function NodeModal({ node, closeModal, modalIsOpen, cyObj }) {
       style={customStyles}
       contentLabel="Example Modal"
     >
-      <h2>{nodeLabel}</h2>
+      <h2>{type}: {nodeLabel}</h2>
       <div className='mesh_link'>
         <h4>{db}:</h4>
         <a href={url} target="_blank">{id_value}</a>
@@ -478,6 +479,10 @@ function NodeModal({ node, closeModal, modalIsOpen, cyObj }) {
             // Sort the paths by length
             paths.sort((a, b) => {
               return a.length - b.length;
+            });
+            // Remove paths of lenght 1 since they're isolated nodes
+            paths = paths.filter((path) => {
+              return path.length > 1;
             });
             setPaths(paths);
           }

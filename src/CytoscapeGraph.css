@@ -21,7 +21,7 @@
     text-decoration: none;
     display: inline-block;
     font-size: 12px;
-    margin: 2px 2px;
+    margin: 1px 1px;
     cursor: pointer;
 }
 
@@ -83,7 +83,7 @@
 }
 
 .sidebar_box {
-    margin: 5px 0;
+    margin: 3px 0;
 }
 
 .canvas {
